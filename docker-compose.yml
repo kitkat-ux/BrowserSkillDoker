@@ -1,0 +1,17 @@
+services:
+  browserskill:
+    build: { context: ., dockerfile: Dockerfile }
+    image: browserskill:local
+    init: true
+    shm_size: 2gb
+    env_file: [.env]
+    environment: { CI: "${CI:-false}", PLAYWRIGHT_BROWSERS_PATH: /ms-playwright }
+    ports: ["${BROWSERSKILL_PORT:-52800}:52800", "${EXTENSION_DEV_PORT:-5173}:5173"]
+    volumes: [".:/workspace", "pnpm-store:/pnpm/store", "cargo-registry:/home/agent/.cargo/registry", "cargo-git:/home/agent/.cargo/git"]
+    working_dir: /workspace
+    deploy:
+      resources:
+        limits: { cpus: "2.0", memory: 4G }
+        reservations: { cpus: "0.5", memory: 1G }
+    security_opt: [no-new-privileges:true]
+volumes: { pnpm-store: {}, cargo-registry: {}, cargo-git: {} }
